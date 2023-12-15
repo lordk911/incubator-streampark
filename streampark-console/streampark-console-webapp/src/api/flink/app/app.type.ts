@@ -136,6 +136,7 @@ export interface AppListRecord {
     empty: boolean;
   };
   streamParkJob: boolean;
+  hadoopUser: string;
 }
 
 interface AppControl {

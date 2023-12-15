@@ -62,6 +62,7 @@ case class SubmitRequest(
     applicationType: ApplicationType,
     savePoint: String,
     args: String,
+    @Nullable hadoopUser: String,
     @Nullable buildResult: BuildResult,
     @Nullable k8sSubmitParam: KubernetesSubmitParam,
     @Nullable extraParameter: JavaMap[String, Any]) {

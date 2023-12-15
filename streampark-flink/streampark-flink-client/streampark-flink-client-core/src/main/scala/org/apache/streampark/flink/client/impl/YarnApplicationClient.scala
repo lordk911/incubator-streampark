@@ -24,6 +24,7 @@ import org.apache.streampark.flink.client.`trait`.YarnClientTrait
 import org.apache.streampark.flink.client.bean._
 import org.apache.streampark.flink.packer.pipeline.ShadedBuildResponse
 
+import org.apache.commons.lang3.StringUtils
 import org.apache.flink.client.deployment.DefaultClusterClientServiceLoader
 import org.apache.flink.client.deployment.application.ApplicationConfiguration
 import org.apache.flink.client.program.ClusterClient
@@ -48,6 +49,14 @@ object YarnApplicationClient extends YarnClientTrait {
   override def setConfig(submitRequest: SubmitRequest, flinkConfig: Configuration): Unit = {
     val flinkDefaultConfiguration = getFlinkDefaultConfiguration(
       submitRequest.flinkVersion.flinkHome)
+    if (StringUtils.isNotEmpty(submitRequest.hadoopUser)) {
+      UserGroupInformation.setLoginUser(
+        UserGroupInformation.createRemoteUser(submitRequest.hadoopUser));
+//      UserGroupInformation.createProxyUser(
+//        UserGroupInformation.getCurrentUser.getUserName,
+//        UserGroupInformation.createRemoteUser(submitRequest.hadoopUser));
+    }
+
     val currentUser = UserGroupInformation.getCurrentUser
     logDebug(s"UserGroupInformation currentUser: $currentUser")
     if (HadoopUtils.isKerberosSecurityEnabled(currentUser)) {

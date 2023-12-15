@@ -482,6 +482,11 @@ export const useCreateAndEditSchema = (
         ifShow: ({ values }) => (edit?.mode ? true : values.jobType == 'customcode'),
       },
       {
+        field: 'hadoopUser',
+        label: t('flink.app.hadoopUser'),
+        component: 'Input'
+      },
+      {
         field: 'description',
         label: t('common.description'),
         component: 'InputTextArea',

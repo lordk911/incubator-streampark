@@ -65,6 +65,7 @@ export default {
   status: 'Run Status',
   startTime: 'Start Time',
   endTime: 'End Time',
+  hadoopUser: 'Hadoop User',
   release: {
     releaseTitle: 'The current release of the application is in progress.',
     releaseDesc: 'are you sure you want to force another build',

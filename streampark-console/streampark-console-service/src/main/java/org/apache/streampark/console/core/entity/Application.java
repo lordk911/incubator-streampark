@@ -174,6 +174,9 @@ public class Application implements Serializable {
   @TableField("TOTAL_TM")
   private Integer totalTM;
 
+  @TableField("HADOOP_USER")
+  private String hadoopUser;
+
   private Integer totalSlot;
   private Integer availableSlot;
   private Integer jmMemory;
