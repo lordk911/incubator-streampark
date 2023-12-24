@@ -484,7 +484,8 @@ export const useCreateAndEditSchema = (
       {
         field: 'hadoopUser',
         label: t('flink.app.hadoopUser'),
-        component: 'Input'
+        component: 'Input',
+        rules: [{ required: true, message: 'hadoop user is required, but this will have no effect if kerberos is enabled. ', type: 'string' }],
       },
       {
         field: 'description',
