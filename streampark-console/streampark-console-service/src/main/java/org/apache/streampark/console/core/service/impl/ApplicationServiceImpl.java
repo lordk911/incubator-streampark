@@ -812,6 +812,7 @@ public class ApplicationServiceImpl extends ServiceImpl<ApplicationMapper, Appli
     newApp.setTags(oldApp.getTags());
     newApp.setTeamId(oldApp.getTeamId());
     newApp.setDependency(oldApp.getDependency());
+    newApp.setHadoopUser(oldApp.getHadoopUser());
 
     boolean saved = save(newApp);
     if (saved) {
