@@ -39,6 +39,8 @@ import java.util.concurrent.Callable
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
+import org.apache.commons.lang3.StringUtils
+import java.security.PrivilegedAction
 
 /** yarn application mode submit */
 object YarnApplicationClient extends YarnClientTrait {
@@ -97,9 +99,19 @@ object YarnApplicationClient extends YarnClientTrait {
   override def doSubmit(
       submitRequest: SubmitRequest,
       flinkConfig: Configuration): SubmitResponse = {
-    SecurityUtils.install(new SecurityConfiguration(flinkConfig))
-    SecurityUtils.getInstalledContext.runSecured(new Callable[SubmitResponse] {
-      override def call(): SubmitResponse = {
+    var proxyUserUgi: UserGroupInformation = UserGroupInformation.getCurrentUser
+    val currentUser = UserGroupInformation.getCurrentUser
+    if (!HadoopUtils.isKerberosSecurityEnabled(currentUser)) {
+      if (StringUtils.isNotEmpty(submitRequest.hadoopUser)) {
+        proxyUserUgi = UserGroupInformation.createProxyUser(
+          submitRequest.hadoopUser,
+          currentUser
+        )
+      }
+    }
+
+    proxyUserUgi.doAs[SubmitResponse](new PrivilegedAction[SubmitResponse] {
+      override def run(): SubmitResponse = {
         val clusterClientServiceLoader = new DefaultClusterClientServiceLoader
         val clientFactory =
           clusterClientServiceLoader.getClusterClientFactory[ApplicationId](flinkConfig)
@@ -112,7 +124,6 @@ object YarnApplicationClient extends YarnClientTrait {
                      |$clusterSpecification
                      |------------------------------------------------------------------
                      |""".stripMargin)
-
           val applicationConfiguration = ApplicationConfiguration.fromConfiguration(flinkConfig)
           var applicationId: ApplicationId = null
           var jobManagerUrl: String = null
@@ -126,13 +137,48 @@ object YarnApplicationClient extends YarnClientTrait {
                      |Flink Job Started: applicationId: $applicationId
                      |__________________________________________________________________
                      |""".stripMargin)
-
           SubmitResponse(applicationId.toString, flinkConfig.toMap, jobManagerUrl = jobManagerUrl)
         } finally {
           Utils.close(clusterDescriptor, clusterClient)
         }
-      }
-    })
+    }
+  })
+//    SecurityUtils.install(new SecurityConfiguration(flinkConfig))
+//    SecurityUtils.getInstalledContext.runSecured(new Callable[SubmitResponse] {
+//      override def call(): SubmitResponse = {
+//        val clusterClientServiceLoader = new DefaultClusterClientServiceLoader
+//        val clientFactory =
+//          clusterClientServiceLoader.getClusterClientFactory[ApplicationId](flinkConfig)
+//        val clusterDescriptor = clientFactory.createClusterDescriptor(flinkConfig)
+//        var clusterClient: ClusterClient[ApplicationId] = null
+//        try {
+//          val clusterSpecification = clientFactory.getClusterSpecification(flinkConfig)
+//          logInfo(s"""
+//                     |------------------------<<specification>>-------------------------
+//                     |$clusterSpecification
+//                     |------------------------------------------------------------------
+//                     |""".stripMargin)
+//
+//          val applicationConfiguration = ApplicationConfiguration.fromConfiguration(flinkConfig)
+//          var applicationId: ApplicationId = null
+//          var jobManagerUrl: String = null
+//          clusterClient = clusterDescriptor
+//            .deployApplicationCluster(clusterSpecification, applicationConfiguration)
+//            .getClusterClient
+//          applicationId = clusterClient.getClusterId
+//          jobManagerUrl = clusterClient.getWebInterfaceURL
+//          logInfo(s"""
+//                     |-------------------------<<applicationId>>------------------------
+//                     |Flink Job Started: applicationId: $applicationId
+//                     |__________________________________________________________________
+//                     |""".stripMargin)
+//
+//          SubmitResponse(applicationId.toString, flinkConfig.toMap, jobManagerUrl = jobManagerUrl)
+//        } finally {
+//          Utils.close(clusterDescriptor, clusterClient)
+//        }
+//      }
+//    })
   }
 
   override def doCancel(cancelRequest: CancelRequest, flinkConf: Configuration): CancelResponse = {

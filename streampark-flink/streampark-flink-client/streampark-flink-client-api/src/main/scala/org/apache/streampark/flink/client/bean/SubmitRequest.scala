@@ -49,6 +49,7 @@ case class SubmitRequest(
     applicationType: ApplicationType,
     savePoint: String,
     args: String,
+    @Nullable hadoopUser: String,
     @Nullable buildResult: BuildResult,
     @Nullable extraParameter: JavaMap[String, Any],
     @Nullable clusterId: String,
