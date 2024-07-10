@@ -1480,6 +1480,7 @@ public class ApplicationServiceImpl extends ServiceImpl<ApplicationMapper, Appli
   @Transactional(rollbackFor = {Exception.class})
   public void start(Application appParam, boolean auto) throws Exception {
     final Application application = getById(appParam.getId());
+    String hadoopUser = getDefaultHadoopUser(appParam.getId());
     Utils.notNull(application);
     if (!application.isCanBeStart()) {
       throw new ApiAlertException("[StreamPark] The application cannot be started repeatedly.");
@@ -1649,7 +1650,8 @@ public class ApplicationServiceImpl extends ServiceImpl<ApplicationMapper, Appli
             extraParameter,
             k8sClusterId,
             k8sNamespace,
-            exposedType);
+            exposedType,
+            hadoopUser);
 
     CompletableFuture<SubmitResponse> future =
         CompletableFuture.supplyAsync(() -> FlinkClient.submit(submitRequest), bootstrapExecutor);
@@ -1973,4 +1975,8 @@ public class ApplicationServiceImpl extends ServiceImpl<ApplicationMapper, Appli
     }
     return Tuple2.apply(k8sNamespace, clusterId);
   }
+
+    private String getDefaultHadoopUser(Long id) {
+        return this.baseMapper.getDefaultHadoopUser(id);
+    }
 }

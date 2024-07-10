@@ -49,12 +49,12 @@ case class SubmitRequest(
     applicationType: ApplicationType,
     savePoint: String,
     args: String,
-    @Nullable hadoopUser: String,
     @Nullable buildResult: BuildResult,
     @Nullable extraParameter: JavaMap[String, Any],
     @Nullable clusterId: String,
     @Nullable kubernetesNamespace: String,
-    @Nullable flinkRestExposedType: FlinkK8sRestExposedType) {
+    @Nullable flinkRestExposedType: FlinkK8sRestExposedType,
+    @Nullable hadoopUser: String) {
 
   private lazy val appProperties: Map[String, String] = getParameterMap(KEY_FLINK_PROPERTY_PREFIX)
 

@@ -374,4 +374,10 @@
         limit #{limitSize}
     </select>
 
+    <select id="getDefaultHadoopUser" resultType="java.lang.String" parameterType="java.lang.Long">
+        select hadoop.hadoop_user_name from t_flink_app app
+            inner join t_user user on app.user_id = user.user_id
+            inner join hadoop_user_mapping hadoop on hadoop.user_name = user.username
+        where app.id = #{id}
+    </select>
 </mapper>
