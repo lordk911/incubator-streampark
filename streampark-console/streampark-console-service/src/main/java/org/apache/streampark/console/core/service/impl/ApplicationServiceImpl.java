@@ -1976,7 +1976,7 @@ public class ApplicationServiceImpl extends ServiceImpl<ApplicationMapper, Appli
     return Tuple2.apply(k8sNamespace, clusterId);
   }
 
-    private String getDefaultHadoopUser(Long id) {
-        return this.baseMapper.getDefaultHadoopUser(id);
-    }
+  private String getDefaultHadoopUser(Long id) {
+    return this.baseMapper.getDefaultHadoopUser(id);
+  }
 }

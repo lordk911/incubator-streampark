@@ -24,6 +24,7 @@ import org.apache.streampark.flink.client.`trait`.YarnClientTrait
 import org.apache.streampark.flink.client.bean._
 import org.apache.streampark.flink.packer.pipeline.ShadedBuildResponse
 
+import org.apache.commons.lang3.StringUtils
 import org.apache.flink.client.deployment.DefaultClusterClientServiceLoader
 import org.apache.flink.client.deployment.application.ApplicationConfiguration
 import org.apache.flink.client.program.ClusterClient
@@ -34,13 +35,12 @@ import org.apache.flink.yarn.configuration.{YarnConfigOptions, YarnDeploymentTar
 import org.apache.hadoop.security.UserGroupInformation
 import org.apache.hadoop.yarn.api.records.ApplicationId
 
+import java.security.PrivilegedAction
 import java.util.Collections
 import java.util.concurrent.Callable
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
-import org.apache.commons.lang3.StringUtils
-import java.security.PrivilegedAction
 
 /** yarn application mode submit */
 object YarnApplicationClient extends YarnClientTrait {
@@ -141,8 +141,8 @@ object YarnApplicationClient extends YarnClientTrait {
         } finally {
           Utils.close(clusterDescriptor, clusterClient)
         }
-    }
-  })
+      }
+    })
 //    SecurityUtils.install(new SecurityConfiguration(flinkConfig))
 //    SecurityUtils.getInstalledContext.runSecured(new Callable[SubmitResponse] {
 //      override def call(): SubmitResponse = {
